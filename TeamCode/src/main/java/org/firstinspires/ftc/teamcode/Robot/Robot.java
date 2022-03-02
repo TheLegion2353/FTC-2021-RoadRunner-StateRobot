@@ -79,7 +79,7 @@ public class Robot {
 	private MecanumDrivetrain drivetrain = null;
 	private Carousel carousel;
 	private Arm arm;
-	private Arm slide;
+	private Arm wrist;
 	private Intake intake;
 	private Gamepad gamepad = null;
 	private Telemetry telemetry = null;
@@ -103,11 +103,11 @@ public class Robot {
 		gamepad = gp;
 		drivetrain = new MecanumDrivetrain(gamepad, telemetry, hwMap);
 
-		setCarouselMotor(hwMap.get(DcMotorEx.class, "carousel/frontEncoder"));
-		setArm(hwMap.get(DcMotorEx.class, "arm/leftEncoder"), hwMap.get(AnalogInput.class, "armPot"));
-		setLinearSlide(hwMap.get(DcMotorEx.class, "wrist"), hwMap.get(AnalogInput.class, "wristPot"));
-		slide.setBounds(0.65, 2.0);
-		setIntake(hwMap.servo.get("intakeServo"));
+		setCarouselMotor(hwMap.get(DcMotorEx.class, "spinner"));
+		setArm(hwMap.get(DcMotorEx.class, "armMotor"), hwMap.get(AnalogInput.class, "armPot"));
+		setWrist(hwMap.get(DcMotorEx.class, "wristMotor"), hwMap.get(AnalogInput.class, "wristPot"));
+		wrist.setBounds(0.1, 2.0);
+		setIntake(hwMap.servo.get("clawServo"));
 	}
 
 	public Robot(Gamepad gp, Telemetry t, HardwareMap hwMap, AutonomousPath path) {
@@ -115,11 +115,11 @@ public class Robot {
 		gamepad = gp;
 		drivetrain = new MecanumDrivetrain(gamepad, telemetry, hwMap);
 
-		setCarouselMotor(hwMap.get(DcMotorEx.class, "carousel/frontEncoder"));
-		setArm(hwMap.get(DcMotorEx.class, "arm/leftEncoder"), hwMap.get(AnalogInput.class, "armPot"));
-		setLinearSlide(hwMap.get(DcMotorEx.class, "wrist"), hwMap.get(AnalogInput.class, "wristPot"));
-		slide.setBounds(0.65, 2.0);
-		setIntake(hwMap.servo.get("intakeServo"));
+		setCarouselMotor(hwMap.get(DcMotorEx.class, "spinner"));
+		setArm(hwMap.get(DcMotorEx.class, "armMotor"), hwMap.get(AnalogInput.class, "armPot"));
+		//setWrist(hwMap.get(DcMotorEx.class, "wristMotor"), hwMap.get(AnalogInput.class, "wristPot"));
+		//wrist.setBounds(0.65, 2.0);
+		setIntake(hwMap.servo.get("clawServo"));
 
 		constructPaths(path);
 	}
@@ -131,17 +131,17 @@ public class Robot {
 				FINAL_TRAJECTORY = drivetrain.getDrivetrain().trajectorySequenceBuilder(drivetrain.getDrivetrain().getPoseEstimate())
 						.addTemporalMarker(() -> {
 							arm.setPosition(.41);
-							slide.setPosition(1.58);
+							wrist.setPosition(1.58);
 						})
 						.waitSeconds(5)
 						.addTemporalMarker(() -> {
 							arm.setPosition(2);
-							slide.setPosition(.5);
+							wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.waitSeconds(10)
 						.build();
@@ -152,7 +152,7 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-14.0, 62.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
 							//arm.setPosition(.62);
-							//slide.setPosition(1.32);
+							//wrist.setPosition(1.32);
 						})
 						.waitSeconds(5)
 						.lineToConstantHeading(new Vector2d(-14.0, 48.0))  // go in front of the shipping hub
@@ -172,12 +172,12 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-60, 36))  // park
 						.addTemporalMarker(() -> {
 							//arm.setPosition(2);
-							//slide.setPosition(.5);
+							//wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							//	arm.kill();
-							//	slide.kill();
+							//	wrist.kill();
 						})
 						.resetVelConstraint()
 						.build();
@@ -188,7 +188,7 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-14.0, 62.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
 							arm.setPosition(.62);
-							slide.setPosition(1.32);
+							wrist.setPosition(1.32);
 						})
 						.waitSeconds(5)
 						.lineToConstantHeading(new Vector2d(-14.0, 48.0))  // go in front of the shipping hub
@@ -208,12 +208,12 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-60, 34))  // park
 						.addTemporalMarker(() -> {
 							arm.setPosition(2);
-							slide.setPosition(.5);
+							wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.resetVelConstraint()
 						.build();
@@ -225,7 +225,7 @@ public class Robot {
 						.waitSeconds(1.5)
 						.addTemporalMarker(() -> {
 							arm.setPosition(.46);
-							slide.setPosition(1.58);
+							wrist.setPosition(1.58);
 						})
 						.lineToConstantHeading(new Vector2d(-14.0, 40.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
@@ -238,12 +238,12 @@ public class Robot {
 						.waitSeconds(0.5)
 						.addTemporalMarker(() -> {
 							arm.setPosition(2.0);
-							slide.setPosition(0.7);
+							wrist.setPosition(0.7);
 						})
 						.waitSeconds(0.5)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.lineToConstantHeading(new Vector2d(-62.5, 56.5))  // go to the carousel thing
 						.UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
@@ -464,7 +464,7 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-14.0, -62.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
 							arm.setPosition(.95);
-							slide.setPosition(1.03);
+							wrist.setPosition(1.03);
 						})
 						.waitSeconds(5)
 						.lineToConstantHeading(new Vector2d(-14.0, -40.0))  // go in front of the shipping hub
@@ -484,12 +484,12 @@ public class Robot {
 						.lineToLinearHeading(new Pose2d(-60, -37, Math.PI / 2.0))  // park
 						.addTemporalMarker(() -> {
 							arm.setPosition(2);
-							slide.setPosition(.5);
+							wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.resetVelConstraint()
 						.build();
@@ -500,7 +500,7 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-14.0, -62.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
 							arm.setPosition(.62);
-							slide.setPosition(1.32);
+							wrist.setPosition(1.32);
 						})
 						.waitSeconds(5)
 						.lineToConstantHeading(new Vector2d(-14.0, -48.0))  // go in front of the shipping hub
@@ -520,12 +520,12 @@ public class Robot {
 						.lineToLinearHeading(new Pose2d(-60, -37, Math.PI / 2.0))  // park
 						.addTemporalMarker(() -> {
 							arm.setPosition(2);
-							slide.setPosition(.5);
+							wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.resetVelConstraint()
 						.build();
@@ -536,7 +536,7 @@ public class Robot {
 						.lineToConstantHeading(new Vector2d(-14.0, -62.0))  // go in front of the shipping hub
 						.addTemporalMarker(() -> {
 							arm.setPosition(.41);
-							slide.setPosition(1.58);
+							wrist.setPosition(1.58);
 						})
 						.waitSeconds(5)
 						.lineToConstantHeading(new Vector2d(-14.0, -48.0))  // go in front of the shipping hub
@@ -556,12 +556,12 @@ public class Robot {
 						.lineToLinearHeading(new Pose2d(-60, -37, Math.PI / 2.0))  // park
 						.addTemporalMarker(() -> {
 							arm.setPosition(2);
-							slide.setPosition(.5);
+							wrist.setPosition(.5);
 						})
 						.waitSeconds(2)
 						.addTemporalMarker(() -> {
 							arm.kill();
-							slide.kill();
+							wrist.kill();
 						})
 						.resetVelConstraint()
 						.build();
@@ -781,18 +781,16 @@ public class Robot {
 	}
 
 	public void autoUpdate() {
-		if (true) {
-			if (arm != null) {
-				arm.update();
-			} else {
-				telemetry.addLine("Intake null!");
-			}
+		if (arm != null) {
+			arm.update();
+		} else {
+			telemetry.addLine("Intake null!");
+		}
 
-			if (slide != null) {
-				slide.update();
-			} else {
-				telemetry.addLine("Slide null!");
-			}
+		if (wrist != null) {
+			wrist.update();
+		} else {
+			telemetry.addLine("wrist null!");
 		}
 		telemetry.update();
 		clock.reset();
@@ -817,8 +815,8 @@ public class Robot {
 			telemetry.addLine("Arm null!");
 		}
 
-		if (slide != null) {
-			slide.update();
+		if (wrist != null) {
+			wrist.update();
 		} else {
 			telemetry.addLine("Wrist null!");
 		}
@@ -842,9 +840,9 @@ public class Robot {
 		arm.setPotentiometer(pot);
 	}
 
-	public void setLinearSlide(DcMotorEx motor, AnalogInput pot) {
-		slide = new Wrist(gamepad, motor, telemetry);
-		slide.setPotentiometer(pot);
+	public void setWrist(DcMotorEx motor, AnalogInput pot) {
+		wrist = new Wrist(gamepad, motor, telemetry);
+		wrist.setPotentiometer(pot);
 
 	}
 

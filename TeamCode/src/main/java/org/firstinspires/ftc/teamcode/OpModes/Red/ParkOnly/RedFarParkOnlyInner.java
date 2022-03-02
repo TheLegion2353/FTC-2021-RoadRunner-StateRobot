@@ -19,7 +19,7 @@ public class RedFarParkOnlyInner extends LinearOpMode {
 		robot.constructPaths(Robot.AutonomousPath.RED_FAR_PARK_2_TRAJECTORY);
 		//robot.setCarouselMotor(hardwareMap.get(DcMotorEx.class, "carousel/frontEncoder"));
 		//robot.setArm(hardwareMap.get(DcMotorEx.class, "arm/leftEncoder"), hardwareMap.get(AnalogInput.class, "armPot"));
-		//robot.setLinearSlide(hardwareMap.get(DcMotorEx.class, "slide"));
+		//robot.setWrist(hardwareMap.get(DcMotorEx.class, "wrist"));
 		//robot.setIntake(hardwareMap.get(DcMotorEx.class, "intake/rightEncoder"));
 		Thread thread = new Thread() {
 			public void run() {

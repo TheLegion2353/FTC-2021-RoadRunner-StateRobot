@@ -11,8 +11,8 @@ public class Wrist extends Arm {
 	public Wrist(Gamepad gp, DcMotorEx motor, Telemetry tel) {
 		super(gp, motor, tel);
 		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
-		kP = 3.5;
-		kI = 0.2;
+		kP = 3.0;
+		kI = 1.0;
 		kD = 0.0;
 		pid = new PID(kP, kI, kD, position);
 	}

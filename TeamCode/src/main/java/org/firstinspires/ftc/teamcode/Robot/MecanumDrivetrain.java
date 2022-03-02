@@ -27,9 +27,6 @@ public class MecanumDrivetrain extends RobotPart {
 
 	private Telemetry telemetry;
 	private SampleMecanumDrive mecanum;
-	private PIDFController headingController;
-	private ElapsedTime clock;
-	private double theta;
 	private int state = 0;
 
 	public MecanumDrivetrain(Gamepad gp, Telemetry tel, HardwareMap hwMap) {
@@ -37,9 +34,6 @@ public class MecanumDrivetrain extends RobotPart {
 		telemetry = tel;
 		mecanum = new SampleMecanumDrive(hwMap);
 		mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-		headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
-		headingController.setInputBounds(-Math.PI, Math.PI);
-		clock = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 	}
 
 	public void followTrajectorySequence(TrajectorySequence sequence) {
@@ -55,39 +49,20 @@ public class MecanumDrivetrain extends RobotPart {
 	}
 	@Override
 	public void driverUpdate() {
-		Pose2d driveDirection = new Pose2d();
 		Pose2d poseEstimate = mecanum.getPoseEstimate();
 		telemetry.addData("x", poseEstimate.getX());
 		telemetry.addData("y", poseEstimate.getY());
 		telemetry.addData("heading", poseEstimate.getHeading());
 
 		if (gamepad != null) {
-			theta +=  3.0 * -gamepad.right_stick_x * (double)clock.time(TimeUnit.MILLISECONDS) / 1000.0;
-			if (theta - poseEstimate.getHeading() > 0.25) {
-				theta = poseEstimate.getHeading() + 0.25;
-			}
-
-			if (theta - poseEstimate.getHeading() < -0.25) {
-				theta = poseEstimate.getHeading() - 0.25;
-			}
-
-			if (gamepad.left_stick_x == 0.0 && gamepad.left_stick_y == 0.0 && gamepad.right_stick_x == 0.0) {
-				theta = poseEstimate.getHeading();
-			}
-			clock.reset();
-			headingController.setTargetPosition(theta);
-
-			double headingInput = (headingController.update(poseEstimate.getHeading()) * DriveConstants.kV) * DriveConstants.TRACK_WIDTH;
-			driveDirection = new Pose2d(
-					-gamepad.left_stick_y,
-					-gamepad.left_stick_x,
-					headingInput
+			mecanum.setWeightedDrivePower(
+					new Pose2d(
+							-gamepad.left_stick_y,
+							-gamepad.left_stick_x,
+							-gamepad.right_stick_x
+					)
 			);
-
-			mecanum.setWeightedDrivePower(driveDirection);
-			headingController.update(poseEstimate.getHeading());
 		}
-		telemetry.addData("theta", theta);
 		mecanum.update();
 	}
 

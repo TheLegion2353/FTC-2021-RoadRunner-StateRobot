@@ -10,8 +10,8 @@ import org.checkerframework.checker.index.qual.LTEqLengthOf;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm extends RobotPart {
-	protected double kP = 1.2;
-	protected double kI = 1.0;
+	protected double kP = 2.0;
+	protected double kI = 0.0;
 	protected double kD = 0.1;
 	protected double position = 0.0;
 	protected static int positionDetent = 0;
@@ -33,8 +33,8 @@ public class Arm extends RobotPart {
 		pid.setErrorOverTimeMax(0.15);
 		motorController = new HardwareControllerEx(tel, DcMotorEx.RunMode.RUN_WITHOUT_ENCODER, null, motor);
 		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
-		beginBound = 0.32;
-		endBound = 2.0;
+		beginBound = 1.3;
+		endBound = 3.3;
 		leftBumper = false;
 		rightBumper = false;
 		manualOverride = true;
@@ -101,7 +101,7 @@ public class Arm extends RobotPart {
 
 	protected void updatePositions() {
 		if (manualOverride) {
-			pid.updateConst(1.2, 1.0, .1);
+			pid.updateConst(kP, kI, kD);
 			position += (gamepad.right_trigger - gamepad.left_trigger) * 1.5 * pid.getElapsedTime();
 			if (position > endBound) {
 				position = endBound;
