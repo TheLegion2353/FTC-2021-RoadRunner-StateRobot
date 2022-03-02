@@ -11,8 +11,8 @@ public class Wrist extends Arm {
 	public Wrist(Gamepad gp, DcMotorEx motor, Telemetry tel) {
 		super(gp, motor, tel);
 		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
-		kP = 3.0;
-		kI = 1.0;
+		kP = 4.0;
+		kI = 2.0;
 		kD = 0.0;
 		pid = new PID(kP, kI, kD, position);
 	}
@@ -33,7 +33,7 @@ public class Wrist extends Arm {
 
 	@Override
 	protected void updatePositions() {
-		if (manualOverride) {
+		if (true) {
 			if (gamepad.dpad_up) {
 				position += 1.5 * pid.getElapsedTime();
 			} else if (gamepad.dpad_down) {
@@ -45,37 +45,6 @@ public class Wrist extends Arm {
 			}
 			if (position < beginBound) {
 				position = beginBound;
-			}
-		} else {
-			switch (positionDetent) {
-				case 0: {  // back
-					position = 1.56;
-				}
-				break;
-
-				case 1: {  // down
-					position = 1.58;
-				}
-				break;
-
-				case 2: {  // lvl 1
-					position = 1.445;
-				}
-				break;
-
-				case 3: {  // lvl 2
-					position = 1.264;
-				}
-				break;
-
-				case 4: {  // lvl 3
-					position = 1.03;
-				}
-				break;
-
-				default: {
-					positionDetent = 0;
-				}
 			}
 		}
 	}

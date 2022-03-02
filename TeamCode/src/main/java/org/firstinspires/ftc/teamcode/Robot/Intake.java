@@ -9,11 +9,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake extends RobotPart {
-
+	private Telemetry telemetry;
 	private HardwareControllerEx motorController;
 
 	public Intake(Gamepad gp, Servo servo, Telemetry tel) {
 		super(gp);
+		telemetry = tel;
 		motorController = new HardwareControllerEx();
 		motorController.addServo(servo);
 		motorController.setPosition(1.0);

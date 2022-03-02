@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm extends RobotPart {
 	protected double kP = 2.0;
-	protected double kI = 0.0;
+	protected double kI = 0.05;
 	protected double kD = 0.1;
 	protected double position = 0.0;
 	protected static int positionDetent = 0;
@@ -34,7 +34,7 @@ public class Arm extends RobotPart {
 		motorController = new HardwareControllerEx(tel, DcMotorEx.RunMode.RUN_WITHOUT_ENCODER, null, motor);
 		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
 		beginBound = 1.3;
-		endBound = 3.3;
+		endBound = 3.4;
 		leftBumper = false;
 		rightBumper = false;
 		manualOverride = true;
@@ -100,50 +100,14 @@ public class Arm extends RobotPart {
 	}
 
 	protected void updatePositions() {
-		if (manualOverride) {
+		if (true) {
 			pid.updateConst(kP, kI, kD);
-			position += (gamepad.right_trigger - gamepad.left_trigger) * 1.5 * pid.getElapsedTime();
+			position += (gamepad.right_trigger - gamepad.left_trigger) * 1.0 * pid.getElapsedTime();
 			if (position > endBound) {
 				position = endBound;
 			}
 			if (position < beginBound) {
 				position = beginBound;
-			}
-		} else {
-			switch (positionDetent) {
-				case 0: {  // back
-					position = 1.8;
-					pid.updateConst(1.2, 1.0, .1);
-				}
-				break;
-
-				case 1: {  // down
-					position = 0.32;
-					pid.updateConst(4, 1.0, .1);
-				}
-				break;
-
-				case 2: {  // lvl 1
-					position = 0.41;
-					pid.updateConst(4, 1.0, .1);
-				}
-				break;
-
-				case 3: {  // lvl 2
-					position = 0.61;
-					pid.updateConst(4, 1.0, .1);
-				}
-				break;
-
-				case 4: {  // lvl 3
-					position = 0.95;
-					pid.updateConst(4, 1.0, .1);
-				}
-				break;
-
-				default: {
-					positionDetent = 0;
-				}
 			}
 		}
 	}
