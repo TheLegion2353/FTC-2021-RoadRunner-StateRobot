@@ -10,9 +10,9 @@ import org.checkerframework.checker.index.qual.LTEqLengthOf;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm extends RobotPart {
-	protected double kP = 2.0;
-	protected double kI = 0.05;
-	protected double kD = 0.1;
+	protected double kP = 7.5;
+	protected double kI = 0.25;
+	protected double kD = 0.25;
 	protected double position = 0.0;
 	protected static int positionDetent = 0;
 	protected Telemetry telemetry = null;
@@ -22,8 +22,9 @@ public class Arm extends RobotPart {
 	protected double beginBound, endBound;
 
 	protected static boolean rightBumper, leftBumper;
-	protected static boolean manualOverride;
+	protected static boolean manualOverride = true;
 	protected boolean kill = false;
+	protected boolean shared = false;
 
 	public Arm(Gamepad gp, DcMotorEx motor, Telemetry tel) {
 		super(gp);
@@ -33,8 +34,24 @@ public class Arm extends RobotPart {
 		pid.setErrorOverTimeMax(0.15);
 		motorController = new HardwareControllerEx(tel, DcMotorEx.RunMode.RUN_WITHOUT_ENCODER, null, motor);
 		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
-		beginBound = 1.3;
-		endBound = 3.4;
+		beginBound = 0.67;
+		endBound = 1.739;
+		leftBumper = false;
+		rightBumper = false;
+		manualOverride = true;
+	}
+
+	public Arm(Gamepad gp, DcMotorEx motor, Telemetry tel, boolean s) {
+		super(gp);
+		shared = s;
+		telemetry = tel;
+		position = 0.0;
+		pid = new PID(kP, kI, kD, position);
+		pid.setErrorOverTimeMax(0.15);
+		motorController = new HardwareControllerEx(tel, DcMotorEx.RunMode.RUN_WITHOUT_ENCODER, null, motor);
+		motorController.setDirection(DcMotorSimple.Direction.REVERSE);
+		beginBound = 0.67;
+		endBound = 1.739;
 		leftBumper = false;
 		rightBumper = false;
 		manualOverride = true;
@@ -100,14 +117,29 @@ public class Arm extends RobotPart {
 	}
 
 	protected void updatePositions() {
-		if (true) {
-			pid.updateConst(kP, kI, kD);
-			position += (gamepad.right_trigger - gamepad.left_trigger) * 1.0 * pid.getElapsedTime();
+		if (manualOverride) {
+			position += (gamepad.right_trigger - gamepad.left_trigger) * .75 * pid.getElapsedTime();
 			if (position > endBound) {
 				position = endBound;
 			}
 			if (position < beginBound) {
 				position = beginBound;
+			}
+		} else {
+			switch (positionDetent) {
+				case 0: {
+					if (shared) {
+						position = beginBound;
+					} else {
+						position = 1.2;
+					}
+				} break;
+				case 1: {
+					position = endBound;
+				} break;
+				default: {
+					positionDetent = 0;
+				}
 			}
 		}
 	}
@@ -115,7 +147,7 @@ public class Arm extends RobotPart {
 	protected void incrimentDetent() {
 		pid.resetErrorOverTime();
 		positionDetent++;
-		if (positionDetent > 4) {
+		if (positionDetent > 1) {
 			positionDetent = 0;
 		}
 	}
@@ -124,12 +156,12 @@ public class Arm extends RobotPart {
 		pid.resetErrorOverTime();
 		positionDetent--;
 		if (positionDetent < 0) {
-			positionDetent = 4;
+			positionDetent = 1;
 		}
 	}
 
 	public void kill() {
-		kill = true;
+		kill = !kill;
 	}
 
 	public void setPosition(double p) {

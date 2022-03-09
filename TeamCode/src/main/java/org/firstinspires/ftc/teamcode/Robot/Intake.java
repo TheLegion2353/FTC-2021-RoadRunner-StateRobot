@@ -25,7 +25,7 @@ public class Intake extends RobotPart {
 		if (gamepad.x) {
 			motorController.setPosition(1.0);
 		} else if (gamepad.y) {
-			motorController.setPosition(0.0);
+			motorController.setPosition(0.2);
 		}
 	}
 

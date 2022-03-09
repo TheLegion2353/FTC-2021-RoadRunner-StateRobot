@@ -16,7 +16,7 @@ public class TestAuto extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		telemetry.addData(">", "Initializing autonomous... DO NOT START");
 		telemetry.update();
-		robot = new Robot(null, telemetry, hardwareMap, Robot.AutonomousPath.TEST_TRAJECTORY);
+		robot = new Robot(null, telemetry, hardwareMap);
 		waitForStart();
 		Thread thread = new Thread() {
 			public void run() {

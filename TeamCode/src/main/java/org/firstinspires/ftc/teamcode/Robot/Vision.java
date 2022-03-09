@@ -64,7 +64,7 @@ public class Vision {
 				position = -1.0;
 				// step through the list of recognitions and display boundary info.
 				for (Recognition recognition : updatedRecognitions) {
-					if (recognition.getLabel().equals("Duck")) {
+					if (recognition.getLabel().equals("Duck") || recognition.getLabel().equals("Cube")) {
 						position = recognition.getLeft();
 						return position;
 					}
